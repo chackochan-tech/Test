@@ -6,7 +6,7 @@ const app = express();
 
 app.use(cors({
   origin: [
-    'https://test-one-orpin-77.vercel.app/',
+    'https://test-one-orpin-77.vercel.app',
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: false
