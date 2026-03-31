@@ -7,8 +7,13 @@ const API_URL = `${BASE_URL}/tasks`;
 
 async function loadTasks() {
   try {
+    console.log('GET:', API_URL);
+
     const response = await fetch(API_URL);
+    console.log('GET status:', response.status);
+
     const tasks = await response.json();
+    console.log('GET data:', tasks);
 
     taskList.innerHTML = '';
 
@@ -35,13 +40,20 @@ async function addTask() {
   }
 
   try {
-    await fetch(API_URL, {
+    console.log('POST:', API_URL, { title });
+
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ title })
     });
+
+    console.log('POST status:', response.status);
+
+    const data = await response.json();
+    console.log('POST data:', data);
 
     taskInput.value = '';
     loadTasks();
@@ -52,9 +64,11 @@ async function addTask() {
 
 async function deleteTask(id) {
   try {
-    await fetch(`${API_URL}/${id}`, {
+    const response = await fetch(`${API_URL}/${id}`, {
       method: 'DELETE'
     });
+
+    console.log('DELETE status:', response.status);
 
     loadTasks();
   } catch (error) {
@@ -63,5 +77,4 @@ async function deleteTask(id) {
 }
 
 addTaskBtn.addEventListener('click', addTask);
-
 loadTasks();
