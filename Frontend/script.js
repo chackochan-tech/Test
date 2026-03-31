@@ -2,7 +2,7 @@ const taskList = document.getElementById('taskList');
 const taskInput = document.getElementById('taskInput');
 const addTaskBtn = document.getElementById('addTaskBtn');
 
-const API_URL = 'http://localhost:5000/tasks';
+const API_URL = 'https://test-wuuo.onrender.com';
 
 async function loadTasks() {
   try {
