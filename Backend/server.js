@@ -5,7 +5,7 @@ const app = express();
 
 app.use(cors({
   origin: [
-    'https://test-gapq2mpub-chans-projects-29b09945.vercel.app'
+    ''
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
