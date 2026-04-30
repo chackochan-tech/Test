@@ -2,7 +2,7 @@ const taskList = document.getElementById('taskList');
 const taskInput = document.getElementById('taskInput');
 const addTaskBtn = document.getElementById('addTaskBtn');
 
-const API_URL = `http://51.20.2.227`;
+const API_URL = `/tasks`;
 
 async function loadTasks() {
   try {
