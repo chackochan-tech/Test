@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const db = require('./db');
+
+const getTenantDb = require('./db/tenantDb');
 
 const app = express();
 
@@ -9,58 +10,62 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Backend is running' });
+  res.json({ message: 'SaaS backend is running' });
 });
 
-app.get('/tasks', async (req, res) => {
+app.get('/api/:tenant/tasks', async (req, res) => {
   try {
+    const db = await getTenantDb(req.params.tenant);
     const [rows] = await db.query('SELECT * FROM tasks ORDER BY id DESC');
     res.json(rows);
   } catch (error) {
-    console.error('Error fetching tasks:', error);
-    res.status(500).json({ message: 'Failed to fetch tasks' });
+    console.error('GET tasks error:', error.message);
+    res.status(400).json({ message: error.message });
   }
 });
 
-app.post('/tasks', async (req, res) => {
-  const { title } = req.body;
-
-  if (!title || !title.trim()) {
-    return res.status(400).json({ message: 'Title is required' });
-  }
-
-  const newTask = {
-    id: Date.now(),
-    title: title.trim()
-  };
-
+app.post('/api/:tenant/tasks', async (req, res) => {
   try {
+    const { title } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: 'Title is required' });
+    }
+
+    const db = await getTenantDb(req.params.tenant);
+
+    const task = {
+      id: Date.now(),
+      title: title.trim()
+    };
+
     await db.query(
       'INSERT INTO tasks (id, title) VALUES (?, ?)',
-      [newTask.id, newTask.title]
+      [task.id, task.title]
     );
 
-    res.status(201).json(newTask);
+    res.status(201).json(task);
   } catch (error) {
-    console.error('Error adding task:', error);
-    res.status(500).json({ message: 'Failed to add task' });
+    console.error('POST tasks error:', error.message);
+    res.status(400).json({ message: error.message });
   }
 });
 
-app.delete('/tasks/:id', async (req, res) => {
-  const id = Number(req.params.id);
-
+app.delete('/api/:tenant/tasks/:id', async (req, res) => {
   try {
-    await db.query('DELETE FROM tasks WHERE id = ?', [id]);
+    const db = await getTenantDb(req.params.tenant);
+
+    await db.query('DELETE FROM tasks WHERE id = ?', [req.params.id]);
+
     res.json({ message: 'Task deleted successfully' });
   } catch (error) {
-    console.error('Error deleting task:', error);
-    res.status(500).json({ message: 'Failed to delete task' });
+    console.error('DELETE task error:', error.message);
+    res.status(400).json({ message: error.message });
   }
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`SaaS backend running on port ${PORT}`);
 });
